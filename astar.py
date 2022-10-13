@@ -48,8 +48,8 @@ def remplire(X,Y,new_array):
         y=Y[i]
         y_coord = int(y/200)
         x_coord= int(x/200)
-        new_array[y_coord][x_coord]=1.
-        if y_coord+1<new_array.shape[0] and y_coord-1 >= 0:
+        if y_coord+1<new_array.shape[0]:
+            new_array[y_coord][x_coord]=1.
             #new_array[y_coord][x_coord+1]=1. 
             #new_array[y_coord][x_coord-1]=1.  
             new_array[y_coord+1][x_coord]=1.
