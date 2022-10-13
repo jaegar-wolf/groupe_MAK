@@ -2,7 +2,7 @@ import csv
 import math
 import numpy as np
 # import matplotlib.pyplot as plt
-import Test_MAK1
+import lidar_MAK
 import robot
 
 # récup le csv et l'afficher 
@@ -21,19 +21,6 @@ def pol2cart(dist,Angle):
     y_final =dist * np.sin(math.radians(Angle))
     return (x_final,y_final)
 
-# def polarToCart(coord):
-#     xArr = []
-#     yArr = []
-#     for row in coord:
-#         x = int(row[1]) * np.cos(math.radians(int(row[0])))
-#         y = int(row[1]) * np.sin(math.radians(int(row[0])))+1000
-
-#         if 0 < y < 2000 and 0 < x < 2000:
-#             # print(x,y)
-#             xArr.append(-x)
-#             yArr.append(y)
-#     return xArr, yArr
-
 def filtre(array):
     X = []
     Y = []
@@ -45,43 +32,28 @@ def filtre(array):
     return(X,Y)
 ## transformer les données en une matrice de maze 
 
-new_array = np.matrix([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]])
-
-# def remplirMatrix(matrix, xArr, yArr):
-#     for index, x in enumerate(xArr):
-#         y = yArr[index]
-#         if(y+1<matrix.shape[0] and x+1<matrix.shape[1]):
-#             matrix[y][x]=1.
-#             matrix[y][x+1]=1. 
-#             matrix[y][x-1]=1.  
-#             matrix[y+1][x]=1.
-#             matrix[y-1][x]=1.
-#     # for i in range(matrix.shape[0]):
-#     #     matrix[i][0] = 0. 
-#     #     matrix[i][9] = 0.
-
-#     return matrix
+# new_array = np.matrix([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#             [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#             [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#             [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#             [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#             [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#             [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#             [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#             [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#             [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]])
             
 def remplire(X,Y,new_array):
     for i,x in enumerate(X):
         y=Y[i]
         y_coord = int(y/200)
         x_coord= int(x/200)
-        if(y_coord+1<new_array.shape[0]-1 and x_coord+1<new_array.shape[1]-1):
-            new_array[y_coord][x_coord]=1.
+        new_array[y_coord][x_coord]=1.
+        if y_coord+1<new_array.shape[0] and y_coord-1 >= 0:
             #new_array[y_coord][x_coord+1]=1. 
             #new_array[y_coord][x_coord-1]=1.  
-            #new_array[y_coord+1][x_coord]=1.
-            #new_array[y_coord-1][x_coord]=1.
+            new_array[y_coord+1][x_coord]=1.
+            new_array[y_coord-1][x_coord]=1.
 
     for i in range(new_array.shape[0]):
         new_array[i][0] = 0. 
@@ -199,14 +171,11 @@ while(True):
     result = Test_MAK1.acquisition()
     array = makeArray(result)
     X,Y= filtre(array)
-    # X = [int((x)/200) for x in X]
-    # Y = [int((y)/200) for y in Y]
     final_array = np.zeros((10,10))
     final_array= remplire(X ,Y, final_array)
     coord = int(final_array.shape[0]/2)
     start = (coord,0)
     end = (coord,9)
-    #maze = np.asarray(final_array)
     print(final_array)
     path = astar(final_array, start, end)
     # displayMatrix(maze)
